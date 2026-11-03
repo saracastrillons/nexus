@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.db
+.pytest_cache/
+coverage/
+
+.vscode/
+backend/app/services/gemini_service_backup.py

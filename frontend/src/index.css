@@ -1,0 +1,2456 @@
+@import "tailwindcss";
+
+/* Keep the conversation and its composer visible together on desktop. */
+.nx-chat-page { margin-block: 0; }
+.nx-chat-page .nx-header { margin-bottom: 20px; }
+.nx-chat-workspace>.nx-panel-heading { display: none; }
+.nx-chat-page .nx-chat-transcript { height: clamp(230px, 38dvh, 480px); }
+.nx-chat-page .nx-chat-composer textarea { min-height: 44px; max-height: 130px; }
+.nx-chat-page .nx-chat-composer { padding-block: 10px; }
+.nx-chat-page .nx-chat-composer-footer { margin-top: 5px; padding-top: 7px; }
+.nx-chat-page .nx-chat-header { margin-bottom: 12px; }
+.nx-chat-page .nx-chat-note { margin-top: 8px; }
+.nx-chat-page .nx-footer { margin-top: 20px; }
+@media (max-width: 760px) {
+  .nx-chat-page .nx-chat-transcript { height: clamp(260px, 48dvh, 480px); }
+}
+
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #e6eef9;
+  background: #060a12;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+a {
+  color: inherit;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #73e6ed;
+  outline-offset: 5px;
+}
+::selection {
+  background: #245a70;
+  color: white;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c4359;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #090f1b;
+}
+.nx-app {
+  --nx-line: #a3c9f51c;
+  --nx-muted: #94a5bb;
+  --nx-cyan: #6ae5ee;
+  min-height: 100vh;
+  display: flex;
+  background:
+    radial-gradient(ellipse at 65% 0%, #12344938, transparent 45%), #060a12;
+}
+.nx-sidebar {
+  width: 234px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  padding: 33px 18px 24px;
+  border-right: 1px solid var(--nx-line);
+  background: linear-gradient(170deg, #101c2c, #080e19 70%);
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+}
+.nx-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  padding: 0 10px;
+  font-size: 26px;
+  letter-spacing: 3px;
+  font-weight: 800;
+}
+.nx-brand small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--nx-muted);
+  font-weight: 500;
+  margin-top: 5px;
+}
+.nx-brand-mark {
+  font-size: 36px;
+  color: var(--nx-cyan);
+  text-shadow: 0 0 26px #42d9ed80;
+}
+.nx-cyan {
+  color: var(--nx-cyan);
+}
+.nx-nav-label,
+.nx-label,
+.nx-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+.nx-nav-label {
+  color: #8193ac;
+  padding: 0 13px;
+  margin: 55px 0 20px;
+}
+.nx-sidebar nav {
+  display: grid;
+  gap: 9px;
+}
+.nx-sidebar nav button {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  min-height: 65px;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #a6b5c8;
+  font-size: 13px;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.nx-sidebar nav button:hover {
+  background: #ffffff07;
+  color: white;
+}
+.nx-sidebar nav button[aria-current] {
+  color: #9af3f6;
+  border-color: #6ae5ee30;
+  background: linear-gradient(90deg, #32cddd18, #2998cd06);
+  box-shadow: inset 3px 0 #6ae5ee;
+}
+.nx-nav-icon {
+  font-size: 24px;
+  width: 25px;
+  text-align: center;
+}
+.nx-sidebar nav small {
+  display: block;
+  color: #8193ac;
+  font-size: 10px;
+  margin-top: 5px;
+}
+.nx-nav-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--nx-cyan);
+  border-radius: 50%;
+  margin-left: auto;
+  box-shadow: 0 0 10px var(--nx-cyan);
+}
+.nx-sidebar-bottom {
+  margin-top: auto;
+  padding: 32px 12px 0;
+}
+.nx-orbit-symbol {
+  display: block;
+  font-size: 55px;
+  color: #5cd9e65c;
+}
+.nx-sidebar-bottom p {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #8598af;
+}
+.nx-sidebar-bottom strong {
+  font-weight: 400;
+  color: #bac8d9;
+}
+.nx-sidebar-bottom .nx-label {
+  display: block;
+  border-top: 1px solid var(--nx-line);
+  padding-top: 20px;
+  margin-top: 24px;
+  color: #73869e;
+  font-size: 8px;
+}
+.nx-main {
+  min-width: 0;
+  flex: 1;
+  padding: 36px clamp(18px, 3vw, 48px) 20px;
+  max-width: 2000px;
+  margin: auto;
+}
+.nx-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+.nx-eyebrow {
+  color: #71d5df;
+  margin: 0 0 12px;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+.nx-eyebrow span {
+  color: #637a93;
+  padding: 0 9px;
+}
+.nx-header h1 {
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -1.5px;
+  margin: 0;
+}
+.nx-header h1 span {
+  color: #8da0b9;
+  font-weight: 300;
+}
+.nx-subtitle {
+  font-size: 12px;
+  color: var(--nx-muted);
+  margin: 12px 0 0;
+}
+.nx-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.nx-button {
+  border: 1px solid #a3c9f529;
+  border-radius: 7px;
+  background: #111e2d;
+  color: #b7c8da;
+  padding: 9px 12px;
+  font-size: 11px;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.nx-button:hover {
+  border-color: #6ae5ee70;
+  background: #142c3b;
+}
+.nx-primary {
+  color: #99f2f4;
+  border-color: #6ae5ee38;
+  background: #2acbdd0d;
+}
+.nx-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-block: 1px solid var(--nx-line);
+  padding: 13px 0;
+  font-size: 10px;
+  color: #8c9eb4;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+.nx-status {
+  color: #7de3c6;
+  font-size: 9px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nx-status i,
+.nx-small-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+}
+.nx-status i {
+  animation: nx-pulse 3s ease-in-out infinite;
+}
+.nx-error {
+  color: #ffa7ac;
+}
+.nx-pending {
+  color: #f1cf90;
+}
+.nx-update {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.nx-dashboard {
+  display: grid;
+  gap: 22px;
+}
+.nx-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.nx-kpi {
+  --accent: #6ae5ee;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--nx-line);
+  border-radius: 12px;
+  padding: 20px 22px;
+  background:
+    radial-gradient(
+      ellipse at 100% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(120deg, #101c2c, #0b1320);
+  transition:
+    transform 0.25s,
+    border-color 0.25s;
+}
+.nx-kpi:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 46px;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent);
+}
+.nx-kpi:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.nx-violet {
+  --accent: #bd9aff;
+}
+.nx-blue {
+  --accent: #80b4ff;
+}
+.nx-kpi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: #adbed1;
+}
+.nx-kpi-top .nx-label {
+  font-size: 9px;
+  letter-spacing: 1.3px;
+}
+.nx-kpi-top > span:last-child {
+  color: var(--accent);
+  font-size: 22px;
+}
+.nx-kpi-value {
+  color: var(--accent);
+  font-size: clamp(30px, 3.6vw, 48px);
+  font-weight: 500;
+  letter-spacing: -1.5px;
+  margin: 14px 0 18px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 32px color-mix(in srgb, var(--accent) 20%, transparent);
+  animation: nx-reveal 0.5s ease-out;
+}
+.nx-kpi-unit {
+  font-size: 9px;
+  color: #8c9eb4;
+  letter-spacing: 1px;
+  margin-left: 12px;
+}
+.nx-kpi-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--nx-line);
+  padding-top: 12px;
+  font-size: 10px;
+  color: #93a5bb;
+}
+.nx-kpi-bottom > span:last-child {
+  color: var(--accent);
+  opacity: 0.7;
+}
+.nx-panel {
+  min-width: 0;
+  border: 1px solid var(--nx-line);
+  border-radius: 12px;
+  background: linear-gradient(140deg, #101b2bdf, #0a121f);
+  padding: 22px;
+  box-shadow: 0 15px 45px #00000018;
+  overflow: hidden;
+}
+.nx-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.nx-panel h3 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+.nx-panel .nx-eyebrow {
+  font-size: 8px;
+  margin-bottom: 9px;
+  color: #8b9fb7;
+}
+.nx-tag {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #8ed8e4;
+  padding: 6px 8px;
+  border: 1px solid #6ae5ee25;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.nx-observation-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+.nx-globe-panel {
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+.nx-globe-stage {
+  position: relative;
+  isolation: isolate;
+  min-height: 420px;
+  flex: 1;
+  display: grid;
+  align-items: center;
+  background: radial-gradient(ellipse at center, #1c709828, transparent 67%);
+  border-block: 1px solid #8baacf12;
+  margin: 0 -22px;
+  overflow: hidden;
+}
+.nx-globe-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.3;
+  background-image:
+    linear-gradient(#5ca0b31a 1px, transparent 1px),
+    linear-gradient(90deg, #5ca0b31a 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse, black, transparent 75%);
+}
+.nx-globe-content {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+.nx-globe-content canvas {
+  max-width: 100%;
+  display: block;
+}
+.nx-globe-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 15px 0;
+  font-size: 9px;
+  color: #8a9eb7;
+  flex-wrap: wrap;
+}
+.nx-globe-footer > span:first-child {
+  color: #87dde5;
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.nx-small-dot {
+  margin-right: 6px;
+}
+.nx-activity-panel {
+  display: flex;
+  flex-direction: column;
+}
+.nx-panel-description {
+  color: #94a7bf;
+  font-size: 11px;
+  margin: 0 0 18px;
+  line-height: 1.7;
+}
+.nx-activity-content {
+  max-height: 432px;
+  overflow: auto;
+  min-width: 0;
+  flex: 1;
+  scrollbar-gutter: stable;
+}
+.nx-activity-content table {
+  font-size: 11px;
+}
+.nx-text-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--nx-line);
+  color: #8ce6ed;
+  padding: 17px 0 0;
+  margin-top: 18px;
+  font-size: 11px;
+  text-align: left;
+}
+.nx-text-button:hover {
+  color: white;
+}
+.nx-chart-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 10px;
+  color: #91a2b8;
+}
+.nx-empty {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 12px;
+  color: #93a7bd;
+  text-align: center;
+  padding: 25px;
+  background: #070f1960;
+  border: 1px dashed #b3d4ff1c;
+  border-radius: 8px;
+}
+.nx-notice {
+  font-size: 12px;
+  color: #f1c590;
+  line-height: 1.7;
+  margin: 0;
+  padding: 12px 16px;
+  border-left: 2px solid #f1c590;
+  background: #f1c59008;
+}
+.nx-footer {
+  border-top: 1px solid var(--nx-line);
+  margin-top: 32px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+  color: #8b9db2;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+}
+.nx-footer b {
+  color: #b8ccdd;
+  font-weight: 500;
+  margin-right: 7px;
+}
+.nx-footer i {
+  display: inline-block;
+  width: 2px;
+  height: 2px;
+  background: #82a3c4;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+.nx-skip {
+  position: fixed;
+  top: 8px;
+  left: 12px;
+  z-index: 100;
+  padding: 12px;
+  background: #123343;
+  color: white;
+  transform: translateY(-150%);
+}
+.nx-skip:focus {
+  transform: none;
+}
+.nx-immersive .nx-sidebar,
+.nx-immersive .nx-kpis,
+.nx-immersive .nx-activity-panel {
+  display: none;
+}
+.nx-immersive .nx-observation-grid {
+  grid-template-columns: 1fr;
+}
+.nx-immersive .nx-globe-stage {
+  min-height: 65dvh;
+}
+@keyframes nx-pulse {
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 2px currentColor;
+  }
+}
+@keyframes nx-reveal {
+  from {
+    opacity: 0.5;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-still *,
+.nx-still *:before,
+.nx-still *:after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (min-width: 1800px) {
+  .nx-globe-stage {
+    min-height: 520px;
+  }
+}
+@media (max-width: 1200px) {
+  .nx-sidebar {
+    width: 200px;
+    padding-inline: 12px;
+  }
+  .nx-brand {
+    font-size: 22px;
+    gap: 8px;
+  }
+  .nx-observation-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .nx-activity-content {
+    max-height: 330px;
+  }
+  .nx-kpi {
+    padding: 18px;
+  }
+  .nx-header {
+    align-items: flex-start;
+  }
+  .nx-header-actions {
+    max-width: 180px;
+    justify-content: flex-end;
+  }
+  .nx-globe-stage {
+    min-height: 440px;
+  }
+}
+@media (max-width: 760px) {
+  .nx-app {
+    display: block;
+  }
+  .nx-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 17px 16px 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--nx-line);
+  }
+  .nx-brand {
+    font-size: 23px;
+  }
+  .nx-brand-mark {
+    font-size: 28px;
+  }
+  .nx-brand small {
+    font-size: 7px;
+  }
+  .nx-nav-label,
+  .nx-sidebar-bottom {
+    display: none;
+  }
+  .nx-sidebar nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    margin-top: 18px;
+    padding-bottom: 4px;
+  }
+  .nx-sidebar nav button {
+    flex-shrink: 0;
+    min-height: 43px;
+    padding: 9px 12px;
+    gap: 7px;
+    font-size: 11px;
+  }
+  .nx-sidebar nav small,
+  .nx-nav-dot {
+    display: none;
+  }
+  .nx-nav-icon {
+    font-size: 17px;
+    width: 18px;
+  }
+  .nx-main {
+    padding: 24px 16px 18px;
+  }
+  .nx-header {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .nx-header-actions {
+    max-width: none;
+    justify-content: flex-start;
+  }
+  .nx-statusbar {
+    gap: 10px 16px;
+  }
+  .nx-update {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .nx-kpis {
+    gap: 10px;
+  }
+  .nx-kpi {
+    padding: 15px 12px;
+  }
+  .nx-kpi-top .nx-label {
+    font-size: 8px;
+    letter-spacing: 0.6px;
+  }
+  .nx-kpi-top > span:last-child {
+    display: none;
+  }
+  .nx-kpi-value {
+    font-size: 30px;
+  }
+  .nx-kpi-unit {
+    display: block;
+    margin: 7px 0 0;
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+  .nx-kpi-bottom {
+    font-size: 9px;
+    line-height: 1.6;
+  }
+  .nx-kpi-bottom > span:last-child {
+    display: none;
+  }
+  .nx-panel {
+    padding: 17px;
+  }
+  .nx-panel h3 {
+    font-size: 16px;
+  }
+  .nx-globe-stage {
+    margin-inline: -17px;
+    min-height: 340px;
+  }
+  .nx-observation-grid,
+  .nx-dashboard {
+    gap: 16px;
+  }
+  .nx-globe-panel {
+    padding-bottom: 0;
+  }
+  .nx-footer {
+    font-size: 8px;
+    line-height: 1.8;
+  }
+}
+@media (max-width: 380px) {
+  .nx-kpis {
+    grid-template-columns: 1fr;
+  }
+  .nx-kpi-unit {
+    display: inline;
+    margin-left: 10px;
+  }
+  .nx-kpi-value {
+    margin: 8px 0;
+  }
+  .nx-kpi-top > span:last-child {
+    display: inline;
+  }
+  .nx-globe-stage {
+    min-height: 280px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Globe contains its own controls and event cards: give it a full workspace. */
+.nx-observation-grid {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.nx-globe-panel {
+  padding: 24px 24px 0;
+}
+
+.nx-globe-panel .nx-panel-heading {
+  margin-bottom: 22px;
+}
+
+.nx-globe-stage {
+  display: block;
+  flex: none;
+  min-height: 0;
+  margin: 0;
+  border: 1px solid #8baacf20;
+  border-radius: 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-gutter: stable;
+}
+
+.nx-globe-content {
+  /* Preserve room for the legacy overlay cards without scaling the canvas. */
+  min-width: 960px;
+  overflow: visible;
+}
+
+.nx-globe-content button {
+  min-height: 40px;
+  padding: 9px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.nx-globe-content input,
+.nx-globe-content select {
+  min-height: 40px;
+  font-size: 12px;
+}
+
+.nx-globe-footer {
+  padding: 18px 0;
+  line-height: 1.7;
+}
+
+.nx-activity-content {
+  flex: none;
+  max-height: 520px;
+  border: 1px solid var(--nx-line);
+  border-radius: 10px;
+  background: #080f19;
+}
+
+.nx-activity-content table {
+  min-width: 680px;
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.nx-activity-content th,
+.nx-activity-content td {
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.nx-activity-content input,
+.nx-activity-content select,
+.nx-activity-content button {
+  min-height: 40px;
+  font-size: 12px;
+}
+
+.nx-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  align-items: stretch;
+}
+
+.nx-kpi {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.nx-kpi-top {
+  min-height: 30px;
+  align-items: start;
+}
+
+.nx-kpi-top .nx-label {
+  line-height: 1.7;
+}
+
+.nx-kpi-value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+  margin: 18px 0 22px;
+}
+
+.nx-kpi-unit {
+  display: inline;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.nx-kpi-bottom {
+  margin-top: auto;
+  line-height: 1.7;
+}
+
+.nx-globe-hint {
+  display: none;
+  margin: 0 0 14px;
+  color: var(--nx-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+@media (max-width: 1280px) {
+  .nx-globe-hint {
+    display: block;
+  }
+}
+
+@media (max-width: 760px) {
+  .nx-globe-panel {
+    padding: 17px 17px 0;
+  }
+  .nx-globe-panel .nx-panel-heading {
+    margin-bottom: 16px;
+  }
+  .nx-kpi {
+    padding: 20px;
+  }
+  .nx-kpi-top > span:last-child {
+    display: inline;
+  }
+  .nx-kpi-value {
+    font-size: 36px;
+  }
+  .nx-kpi-unit {
+    font-size: 9px;
+  }
+  .nx-kpi-bottom {
+    font-size: 11px;
+  }
+  .nx-activity-content {
+    max-height: 440px;
+  }
+}
+
+.nx-immersive .nx-globe-stage {
+  min-height: 0;
+}
+
+/* Selected globe event: compact reading, separate facts, fixed navigation. */
+.nx-event-card {
+  position: absolute;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100% - 32px);
+  max-height: calc(100% - 92px);
+  overflow: hidden;
+  border: 1px solid #6ae5ee38;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #13263af5, #091522f5);
+  box-shadow:
+    0 20px 55px #0007,
+    inset 0 1px #ffffff0a;
+  backdrop-filter: blur(18px);
+  color: #e6eef9;
+  text-align: left;
+}
+.nx-event-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 16px 18px;
+  border-bottom: 1px solid #a3c9f51c;
+}
+.nx-event-card .nx-event-label {
+  margin: 0 0 6px;
+  color: #99adc4;
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+.nx-event-header .nx-event-label {
+  font-size: 7px;
+  letter-spacing: 1.2px;
+}
+.nx-event-card .nx-event-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.nx-event-card .nx-event-close {
+  flex-shrink: 0;
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 1px solid #ffffff16;
+  border-radius: 8px;
+  background: #ffffff05;
+  color: #b8c9dc;
+  font-size: 22px;
+  line-height: 1;
+}
+.nx-event-body {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 18px;
+  scrollbar-width: thin;
+}
+.nx-event-location {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+.nx-event-location > span {
+  color: var(--event-accent);
+  font-size: 19px;
+  line-height: 1.1;
+}
+.nx-event-location > div {
+  min-width: 0;
+}
+.nx-event-place {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.nx-event-reading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #6ae5ee20;
+  border-radius: 12px;
+  background: #25cbd208;
+}
+.nx-event-magnitude {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  color: var(--event-accent);
+  font-size: 32px;
+  font-weight: 650;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.nx-event-magnitude > span {
+  font-size: 8px;
+  letter-spacing: 0.6px;
+  color: #94a9be;
+  font-weight: 500;
+}
+.nx-event-depth {
+  min-width: 0;
+  border-left: 1px solid #6ae5ee20;
+  padding-left: 12px;
+}
+.nx-event-depth > p:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.nx-event-depth > p > span {
+  font-size: 10px;
+  color: #a1b3c7;
+}
+.nx-event-facts {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 13px;
+}
+.nx-event-facts > div + div {
+  border-top: 1px solid #a3c9f518;
+  padding-top: 13px;
+}
+.nx-event-facts dt {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #99adc4;
+  margin-bottom: 7px;
+}
+.nx-event-facts dd {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.nx-event-facts time {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3px 10px;
+}
+.nx-event-time {
+  color: #a9bed2;
+  font-variant-numeric: tabular-nums;
+}
+.nx-event-coordinates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: #94e8ed;
+  font-variant-numeric: tabular-nums;
+}
+.nx-event-coordinates small {
+  color: #8ba3bc;
+  font-size: 8px;
+}
+.nx-event-navigation {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #a3c9f51c;
+  background: #050d1750;
+}
+.nx-event-navigation > div {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.nx-event-navigation span {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.nx-event-navigation small {
+  color: #8ba3bc;
+}
+.nx-event-card .nx-event-navigation button {
+  min-height: 32px;
+  padding: 5px 8px;
+  border: 1px solid #6ae5ee20;
+  border-radius: 7px;
+  background: #6ae5ee07;
+  font-size: 10px;
+  color: #99e9ee;
+}
+.nx-event-card button:hover:not(:disabled) {
+  background: #6ae5ee18;
+  border-color: #6ae5ee66;
+}
+.nx-event-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* Adapt the globe to its panel width, including focus mode and sidebar space. */
+.nx-globe-stage {
+  container: nx-observation / inline-size;
+  overflow: hidden;
+}
+.nx-globe-content {
+  min-width: 0;
+}
+.nx-earth-workspace {
+  min-width: 0;
+}
+.nx-earth-canvas {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.nx-globe-hint {
+  display: block;
+}
+
+@container nx-observation (max-width: 1100px) {
+  .nx-earth-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    padding: 0 16px 16px;
+    min-height: 0;
+    align-items: start;
+  }
+  .nx-earth-canvas {
+    grid-column: 1 / -1;
+  }
+  .nx-earth-workspace .nx-earth-rotation,
+  .nx-earth-workspace .nx-earth-global {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    align-self: stretch;
+  }
+  .nx-earth-summary,
+  .nx-earth-events,
+  .nx-earth-workspace .nx-event-card {
+    position: static;
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+    max-height: none;
+    margin: 0;
+    overflow: hidden;
+    align-self: stretch;
+  }
+  .nx-earth-summary {
+    padding: 18px;
+  }
+  .nx-earth-events {
+    padding: 18px;
+  }
+  .nx-earth-events [aria-label="Earthquake events list"] {
+    max-height: 360px;
+  }
+  .nx-event-body {
+    overflow: visible;
+  }
+}
+
+@container nx-observation (max-width: 540px) {
+  .nx-earth-workspace {
+    gap: 12px;
+    padding: 0 10px 12px;
+  }
+  .nx-earth-summary,
+  .nx-earth-events,
+  .nx-earth-workspace .nx-event-card {
+    grid-column: 1 / -1;
+  }
+  .nx-earth-summary {
+    padding: 16px;
+  }
+  .nx-earth-events {
+    padding: 16px;
+  }
+}
+
+/* Seismic explorer; container rules also adapt the dashboard instance. */
+.nx-seismic {
+  container: nx-seismic / inline-size;
+  min-width: 0;
+  color: #dce8f6;
+}
+
+/* Weather observation workspace. */
+.nx-weather {
+  container: nx-weather / inline-size;
+  min-width: 0;
+}
+
+/* Intelligence assistant: readable transcript and a persistent composer. */
+.nx-chat {
+  container: nx-chat / inline-size;
+  position: relative;
+  min-width: 0;
+}
+.nx-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.nx-chat-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.nx-chat-identity > span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #6ae5ee35;
+  border-radius: 12px;
+  color: #8feaf0;
+  background: #3dbed412;
+  font-size: 24px;
+}
+.nx-chat .nx-eyebrow {
+  font-size: 8px;
+  line-height: 1.7;
+  color: #85becd;
+  margin-bottom: 7px;
+}
+.nx-chat .nx-chat-header h3 {
+  font-size: 19px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.nx-chat-context {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #8fa8c0;
+  font-size: 9px;
+  line-height: 1.8;
+  padding: 12px 0;
+  border-top: 1px solid #a3c9f51c;
+}
+.nx-chat-context > span:first-child {
+  color: #a6cbd4;
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.nx-chat-transcript {
+  height: clamp(350px, 55dvh, 620px);
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 24px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at 50% 0%, #23495b1c, transparent 70%), #080f1b;
+}
+.nx-chat-welcome {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px 0;
+}
+.nx-chat-emblem {
+  display: grid;
+  place-items: center;
+  height: 56px;
+  width: 56px;
+  border: 1px solid #6ae5ee2b;
+  border-radius: 17px;
+  background: #6ae5ee08;
+  color: #8feaf0;
+  font-size: 32px;
+  box-shadow: 0 0 40px #4ecddd0a;
+  margin-bottom: 20px;
+}
+.nx-chat-welcome h4 {
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.4;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+  margin: 0 0 12px;
+}
+.nx-chat-welcome > p:last-of-type {
+  max-width: 460px;
+  margin: 0;
+  color: #98aec5;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.nx-chat-suggestions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: 12px;
+  margin-top: 30px;
+}
+.nx-chat-suggestions button {
+  min-width: 0;
+  position: relative;
+  padding: 16px;
+  border: 1px solid #a3c9f51f;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #162638, #0b1624);
+  text-align: left;
+  color: #c8deec;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.nx-chat-suggestions button:hover {
+  border-color: #6ae5ee66;
+  transform: translateY(-2px);
+}
+.nx-chat-suggestions button > span:first-child {
+  font-size: 22px;
+  color: #8adce5;
+  display: block;
+  margin-bottom: 12px;
+}
+.nx-chat-suggestions strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.nx-chat-suggestions small {
+  display: block;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #8fa8c0;
+  margin-top: 7px;
+}
+.nx-chat-suggestion-arrow {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  color: #80a8bd;
+  font-size: 15px;
+}
+.nx-chat-message {
+  max-width: 92%;
+  margin: 0 0 20px;
+  padding: 17px 20px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.85;
+}
+.nx-chat-user {
+  margin-left: auto;
+  max-width: 78%;
+  border-color: #809fff2b;
+  background: #19305470;
+  border-bottom-right-radius: 4px;
+}
+.nx-chat-assistant {
+  margin-right: auto;
+  border-color: #7fcddf22;
+  background: #10213080;
+  border-bottom-left-radius: 4px;
+}
+.nx-chat-message > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+.nx-chat-message > header > span {
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  color: #93e2e8;
+  font-weight: 600;
+}
+.nx-chat-user > header > span {
+  color: #b3c7f6;
+}
+.nx-chat-message > header > button {
+  padding: 3px 7px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 5px;
+  background: transparent;
+  color: #a0b9cb;
+  font-size: 9px;
+  min-height: 28px;
+}
+.nx-chat-message > header > button:hover {
+  color: #b4f2f4;
+  border-color: #6ae5ee55;
+}
+.nx-chat-prose {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #d5e3ef;
+}
+.nx-chat-prose p {
+  margin: 0 0 12px;
+}
+.nx-chat-prose > :last-child {
+  margin-bottom: 0;
+}
+.nx-chat-user .nx-chat-prose {
+  white-space: pre-wrap;
+}
+.nx-chat-prose ul,
+.nx-chat-prose ol {
+  padding-left: 22px;
+  margin: 10px 0 14px;
+}
+.nx-chat-prose ul {
+  list-style-type: disc;
+}
+.nx-chat-prose ol {
+  list-style-type: decimal;
+}
+.nx-chat-prose li {
+  margin: 6px 0;
+}
+.nx-chat-prose li > p {
+  margin: 0;
+}
+.nx-chat-prose strong {
+  color: #b9edf0;
+  font-weight: 600;
+}
+.nx-chat-prose h1,
+.nx-chat-prose h2,
+.nx-chat-prose h3,
+.nx-chat-prose h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  line-height: 1.6;
+}
+.nx-chat-prose a {
+  color: #8fe4ed;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.nx-chat-prose blockquote {
+  margin: 14px 0;
+  padding: 4px 14px;
+  border-left: 2px solid #78cbd55c;
+  color: #a8bdd0;
+}
+.nx-chat-prose code {
+  font-size: 11px;
+  background: #030b1570;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+.nx-chat-prose pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: 14px;
+  background: #050c18;
+  border: 1px solid #a3c9f51c;
+  border-radius: 8px;
+  margin: 14px 0;
+}
+.nx-chat-prose pre code {
+  padding: 0;
+  background: transparent;
+  white-space: pre;
+}
+.nx-chat-prose hr {
+  border: 0;
+  border-top: 1px solid #a3c9f51c;
+  margin: 20px 0;
+}
+.nx-chat-table-wrap {
+  max-width: 100%;
+  overflow: auto;
+  margin: 14px 0;
+}
+.nx-chat-prose table {
+  border-collapse: collapse;
+  min-width: 300px;
+  font-size: 11px;
+  width: 100%;
+}
+.nx-chat-prose th,
+.nx-chat-prose td {
+  border: 1px solid #a3c9f525;
+  padding: 9px 12px;
+  text-align: left;
+}
+.nx-chat-prose th {
+  color: #b9edf0;
+  background: #68cad40a;
+}
+.nx-chat-thinking {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: #a0d9e0;
+  padding: 8px 0;
+  font-size: 11px;
+}
+.nx-chat-thinking > span {
+  margin-right: 5px;
+  font-size: 17px;
+}
+.nx-chat-thinking p {
+  margin: 0 8px 0 0;
+}
+.nx-chat-thinking i {
+  height: 4px;
+  width: 4px;
+  border-radius: 50%;
+  background: #85dce6;
+  animation: nx-pulse 1.5s infinite;
+}
+.nx-chat-thinking i:nth-last-child(2) {
+  animation-delay: 0.2s;
+}
+.nx-chat-thinking i:last-child {
+  animation-delay: 0.4s;
+}
+.nx-chat-error {
+  padding: 14px 16px;
+  border: 1px solid #e3b57933;
+  background: #e3b57908;
+  border-radius: 9px;
+  color: #e6cba7;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.nx-chat-error p {
+  margin: 0 0 10px;
+}
+.nx-chat-announcement {
+  min-height: 32px;
+  padding: 9px 2px;
+  color: #8fa8be;
+  font-size: 9px;
+  line-height: 1.5;
+}
+.nx-chat-latest {
+  display: block;
+  margin: 10px auto 0;
+}
+.nx-chat-composer {
+  border: 1px solid #8cb6da35;
+  border-radius: 12px;
+  background: #0b1725;
+  padding: 14px 16px 10px;
+}
+.nx-chat-composer:focus-within {
+  border-color: #6ae5ee77;
+  box-shadow: 0 0 0 2px #6ae5ee08;
+}
+.nx-chat-composer textarea {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  max-height: 220px;
+  resize: vertical;
+  border: 0;
+  background: transparent;
+  color: #e1edf7;
+  padding: 2px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.nx-chat-composer textarea::placeholder {
+  color: #849db6;
+}
+.nx-chat-composer-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #a3c9f514;
+}
+.nx-chat-composer-footer > span {
+  color: #8ca4bd;
+  font-size: 9px;
+}
+.nx-chat-note {
+  color: #8ca4bd;
+  font-size: 9px;
+  line-height: 1.8;
+  margin: 12px 0 0;
+}
+.nx-chat button:disabled {
+  cursor: not-allowed;
+}
+@container nx-chat (max-width: 650px) {
+  .nx-chat-transcript {
+    padding: 16px;
+  }
+  .nx-chat-suggestions {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 20px;
+    gap: 8px;
+  }
+  .nx-chat-suggestions button {
+    padding: 12px 14px 12px 44px;
+  }
+  .nx-chat-suggestions button > span:first-child {
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    font-size: 19px;
+  }
+  .nx-chat-suggestions small {
+    margin-top: 3px;
+    padding-right: 8px;
+  }
+  .nx-chat-message {
+    max-width: 100%;
+    padding: 14px;
+  }
+  .nx-chat-user {
+    max-width: 92%;
+  }
+  .nx-chat-welcome h4 {
+    font-size: 23px;
+  }
+}
+@container nx-chat (max-width: 420px) {
+  .nx-chat-transcript {
+    padding: 12px;
+    height: 440px;
+  }
+  .nx-chat-identity {
+    gap: 10px;
+  }
+  .nx-chat-identity > span {
+    width: 36px;
+    height: 36px;
+  }
+  .nx-chat .nx-chat-header h3 {
+    font-size: 16px;
+  }
+  .nx-chat-composer {
+    padding-inline: 12px;
+  }
+  .nx-chat-composer-footer > span {
+    flex-basis: 100%;
+  }
+  .nx-chat-composer-footer .nx-button {
+    margin-left: auto;
+  }
+}
+.nx-weather-search {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.nx-weather-search label {
+  flex: 1 1 260px;
+  display: grid;
+  gap: 9px;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: #a1b6cd;
+}
+.nx-weather-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #9bbce42b;
+  border-radius: 8px;
+  background: #070f1b;
+  padding: 11px 14px;
+  color: #e1ebf5;
+  font-size: 13px;
+  letter-spacing: normal;
+}
+.nx-weather-search input::placeholder {
+  color: #8499b0;
+}
+.nx-weather-search .nx-button {
+  min-height: 44px;
+}
+.nx-weather button:disabled {
+  cursor: not-allowed;
+}
+.nx-weather-status {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 22px;
+  color: #8ea5bd;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.nx-weather-status > span:first-child {
+  color: #a2dcdf;
+}
+.nx-weather-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+.nx-weather-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 28px;
+  border: 1px solid #6ae5ee2b;
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 100% 20%, #1b758a33, transparent 75%),
+    linear-gradient(140deg, #12283b, #0b1624);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.nx-weather-hero .nx-eyebrow {
+  position: relative;
+  font-size: 8px;
+  line-height: 1.8;
+  color: #91cfd9;
+}
+.nx-weather .nx-weather-hero h3 {
+  position: relative;
+  max-width: 85%;
+  font-size: clamp(19px, 2.2vw, 27px);
+  line-height: 1.4;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.nx-weather-orbit {
+  position: absolute;
+  top: -45px;
+  right: -45px;
+  z-index: -1;
+  color: #70dce912;
+  font-size: 260px;
+  font-weight: 200;
+  line-height: 1;
+  pointer-events: none;
+}
+.nx-weather-temperature {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 8px;
+  margin: 22px 0 18px;
+  color: #b2f5f4;
+  font-size: clamp(48px, 5vw, 70px);
+  font-weight: 350;
+  letter-spacing: -3px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.nx-weather-temperature > span {
+  margin-top: 6px;
+  color: #85c6d1;
+  font-size: 24px;
+  letter-spacing: 0;
+}
+.nx-weather-observed {
+  margin: 0;
+  color: #adbed1;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.nx-weather-observed > span {
+  color: #8ea8c0;
+  font-size: 9px;
+}
+.nx-weather-location {
+  display: block;
+  margin-top: 22px;
+  padding-top: 13px;
+  border-top: 1px solid #8bc5df1c;
+  color: #8eb9ca;
+  font-size: 8px;
+  letter-spacing: 0.7px;
+  line-height: 1.8;
+}
+.nx-weather-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.nx-weather-metric {
+  --accent: #8cdeea;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 12px;
+  background: linear-gradient(140deg, #12203090, #0b1521);
+}
+.nx-weather-metric.nx-amber {
+  --accent: #efd09d;
+}
+.nx-weather-metric.nx-blue {
+  --accent: #a0c4ff;
+}
+.nx-weather-metric.nx-violet {
+  --accent: #c8afff;
+}
+.nx-weather-metric > p {
+  margin: 0 0 15px;
+  color: #a9bdd1;
+  font-size: 11px;
+}
+.nx-weather-metric > strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--accent);
+  font-size: 29px;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.nx-weather-metric strong > span {
+  color: #8fa8c0;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.nx-weather-metric > small {
+  display: block;
+  margin-top: 12px;
+  color: #8ba1b9;
+  font-size: 9px;
+  line-height: 1.7;
+}
+.nx-weather-checks {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 10px;
+  background: #83d6df04;
+}
+.nx-weather-checks .nx-eyebrow {
+  font-size: 8px;
+  margin-bottom: 9px;
+  color: #9ab6cb;
+}
+.nx-weather h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.nx-weather-checks p:last-child {
+  color: #91a8c0;
+  font-size: 10px;
+  line-height: 1.8;
+  margin: 8px 0 0;
+  max-width: 560px;
+}
+.nx-weather-flag {
+  color: #efd09d;
+  border-color: #efd09d44;
+}
+.nx-weather-alert-details {
+  margin: 12px 0 24px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 9px;
+  padding: 14px 18px;
+}
+.nx-weather-alert-details summary {
+  cursor: pointer;
+  color: #9cc7d6;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.nx-weather-alert-details summary:focus-visible {
+  outline: 2px solid #73e6ed;
+  outline-offset: 4px;
+}
+.nx-weather-alert-details[open] summary {
+  margin-bottom: 18px;
+}
+.nx-weather-forecast {
+  margin-top: 24px;
+  border-top: 1px solid #a3c9f51c;
+  padding-top: 24px;
+}
+.nx-weather-forecast > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.nx-weather-forecast .nx-eyebrow {
+  font-size: 8px;
+}
+.nx-weather-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #a3c9f51c;
+  border-radius: 9px;
+  background: #070f1b;
+}
+.nx-weather-switch button {
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #96acc3;
+  padding: 8px 12px;
+  font-size: 10px;
+}
+.nx-weather-switch button[aria-pressed="true"] {
+  color: #9ceaf0;
+  background: #6ae5ee0c;
+  border-color: #6ae5ee2b;
+}
+.nx-weather-chart {
+  min-width: 0;
+}
+.nx-weather-note {
+  margin-top: 22px;
+  padding-top: 15px;
+  border-top: 1px solid #a3c9f514;
+  font-size: 9px;
+  line-height: 1.9;
+  color: #8da4bd;
+}
+@container nx-weather (max-width: 740px) {
+  .nx-weather-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .nx-weather-hero {
+    padding: 24px;
+  }
+  .nx-weather-temperature {
+    font-size: 60px;
+  }
+}
+@container nx-weather (max-width: 420px) {
+  .nx-weather-search label {
+    flex-basis: 100%;
+  }
+  .nx-weather-search .nx-button {
+    flex: 1;
+    padding-inline: 8px;
+  }
+  .nx-weather-hero {
+    padding: 20px;
+  }
+  .nx-weather-metrics {
+    gap: 10px;
+  }
+  .nx-weather-metric {
+    padding: 15px 12px;
+  }
+  .nx-weather-metric > strong {
+    font-size: 25px;
+  }
+  .nx-weather-switch {
+    width: 100%;
+  }
+  .nx-weather-switch button {
+    flex: 1;
+    padding-inline: 8px;
+  }
+}
+.nx-seismic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.nx-seismic-header .nx-eyebrow {
+  color: #79dce6;
+  font-size: 8px;
+}
+.nx-seismic .nx-seismic-header h3 {
+  font-size: clamp(19px, 2vw, 25px);
+  letter-spacing: -0.6px;
+  font-weight: 500;
+  margin: 0;
+}
+.nx-seismic-header p:last-child {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #97abc2;
+  margin: 9px 0 0;
+}
+.nx-seismic-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 24px;
+  border: 1px solid #90b8e521;
+  border-radius: 10px;
+  background: linear-gradient(110deg, #1e4b5a20, #101b2a50);
+  overflow: hidden;
+}
+.nx-seismic-summary > div {
+  padding: 18px 20px;
+  min-width: 0;
+}
+.nx-seismic-summary > div + div {
+  border-left: 1px solid #90b8e521;
+}
+.nx-seismic-summary span {
+  display: block;
+  color: #96acc3;
+  font-size: 8px;
+  letter-spacing: 1px;
+  line-height: 1.7;
+}
+.nx-seismic-summary strong {
+  display: block;
+  color: #9ae9ee;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.nx-seismic-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+.nx-seismic-filters label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #b2c3d5;
+  font-size: 10px;
+}
+.nx-seismic-filters input,
+.nx-seismic-filters select {
+  min-width: 0;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #9bbce42b;
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #070f1b;
+  color: #dce8f6;
+  font-size: 12px;
+}
+.nx-seismic-filters input::placeholder {
+  color: #8499b0;
+}
+.nx-seismic-filters .nx-button {
+  min-height: 42px;
+}
+.nx-seismic button:disabled {
+  cursor: not-allowed;
+}
+.nx-seismic-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 12px;
+  color: #8ea5bc;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.nx-seismic-meta > span:first-child {
+  color: #a4dfdf;
+}
+.nx-seismic-results {
+  border: 1px solid #a3c9f51c;
+  border-radius: 10px;
+  overflow: auto;
+  margin-top: 12px;
+}
+.nx-seismic .nx-seismic-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  text-align: left;
+}
+.nx-seismic .nx-seismic-table th {
+  padding: 14px 16px;
+  background: #0a1422;
+  color: #92a8bf;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.nx-seismic .nx-seismic-table td {
+  padding: 16px;
+  border-top: 1px solid #a3c9f514;
+  vertical-align: middle;
+  line-height: 1.7;
+}
+.nx-seismic-table tbody tr {
+  background: #0b162440;
+  transition: background 0.2s;
+}
+.nx-seismic-table tbody tr:nth-child(even) {
+  background: #a3c9f503;
+}
+.nx-seismic-table tbody tr:hover {
+  background: #6ae5ee08;
+}
+.nx-seismic-location {
+  display: block;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.nx-seismic-id {
+  display: block;
+  color: #829ab2;
+  font-size: 9px;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+.nx-seismic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--mag-color);
+  border: 1px solid color-mix(in srgb, var(--mag-color) 23%, transparent);
+  background: color-mix(in srgb, var(--mag-color) 6%, transparent);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.nx-seismic-badge i {
+  height: 4px;
+  width: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.nx-seismic-low {
+  --mag-color: #83e4ec;
+}
+.nx-seismic-moderate {
+  --mag-color: #c4a3ff;
+}
+.nx-seismic-medium {
+  --mag-color: #f6c677;
+}
+.nx-seismic-high {
+  --mag-color: #ffa3ae;
+}
+.nx-seismic-unknown {
+  --mag-color: #a6b9ce;
+}
+.nx-seismic-depth {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.nx-seismic-depth small {
+  color: #89a1ba;
+  font-size: 10px;
+}
+.nx-seismic-table time {
+  display: block;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.nx-seismic-table time small {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  color: #8da6bf;
+}
+.nx-seismic-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 0;
+  color: #96acc3;
+  font-size: 10px;
+}
+.nx-seismic-footer nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nx-seismic-footer nav > span {
+  font-variant-numeric: tabular-nums;
+}
+.nx-seismic-note {
+  border-top: 1px solid #a3c9f514;
+  margin: 0;
+  padding-top: 14px;
+  color: #89a2bc;
+  font-size: 9px;
+  line-height: 1.9;
+}
+.nx-seismic-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 20px;
+  text-align: center;
+}
+.nx-seismic-empty > span {
+  color: #69c5d2;
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+.nx-seismic-empty strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+.nx-seismic-empty p {
+  max-width: 340px;
+  color: #92a8bf;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.nx-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* The explorer owns its scrolling; do not crop its controls or pagination. */
+.nx-activity-content:has(.nx-seismic) {
+  max-height: none;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+@container nx-seismic (max-width: 740px) {
+  .nx-seismic-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .nx-seismic-filters label:first-child {
+    grid-column: 1 / -1;
+  }
+  .nx-seismic-filters > .nx-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .nx-seismic-summary > div {
+    padding: 14px 12px;
+  }
+  .nx-seismic-summary span {
+    font-size: 7px;
+    letter-spacing: 0.6px;
+  }
+  .nx-seismic-summary strong {
+    font-size: 24px;
+  }
+}
+@container nx-seismic (max-width: 560px) {
+  .nx-seismic .nx-seismic-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .nx-seismic .nx-seismic-table tbody {
+    display: block;
+    padding: 10px;
+  }
+  .nx-seismic .nx-seismic-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid #a3c9f51c;
+    border-radius: 9px;
+    margin-bottom: 10px;
+  }
+  .nx-seismic .nx-seismic-table tr:last-child {
+    margin-bottom: 0;
+  }
+  .nx-seismic .nx-seismic-table td {
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    text-align: left;
+  }
+  .nx-seismic-table td:first-child,
+  .nx-seismic-table td:last-child {
+    grid-column: 1 / -1;
+  }
+  .nx-seismic-table td[data-label]:before {
+    content: attr(data-label);
+    display: block;
+    color: #8ea5bc;
+    font-size: 8px;
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+  }
+  .nx-seismic-table time {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .nx-seismic-table time small {
+    margin: 0;
+  }
+  .nx-seismic-footer {
+    align-items: start;
+  }
+  .nx-seismic-footer nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
