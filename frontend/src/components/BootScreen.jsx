@@ -14,6 +14,8 @@ export default function BootScreen({ onDone }) {
     const push = (label, state) => active && setLines(previous => [...previous, { label, state }]);
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
     async function run() {
+      // Every update happens after an await, so a discarded (StrictMode) run never writes.
+      await wait(120);
       push("Initialising planetary observation kernel", "OK");
       setProgress(18);
       await wait(260);

@@ -6,6 +6,7 @@ from google import genai
 from google.genai import errors
 import requests
 import re
+import unicodedata
 import time
 import math
 
@@ -22,9 +23,11 @@ INTERNAL_API_URL = settings.INTERNAL_API_URL.rstrip("/")
 
 
 def get_nexus_earthquakes():
+    # Same 24-hour window the dashboard shows by default, so answers match the interface.
     response = requests.get(
         f"{INTERNAL_API_URL}/api/earthquakes/",
-        timeout=10
+        params={"window": "day", "limit": 500},
+        timeout=20
     )
 
     response.raise_for_status()
@@ -66,6 +69,35 @@ def get_average_magnitude(earthquakes: list[dict]):
 
 def get_earthquake_count(earthquakes: list[dict]):
     return len(earthquakes)
+
+
+EARTHQUAKE_FIELDS = ("magnitude", "place", "depth", "time", "latitude", "longitude", "tsunami")
+
+
+def summarize_earthquake_records(earthquakes: list[dict], size: int = 15):
+    """Keep the prompt compact: the strongest and the most recent events with key fields only."""
+    def compact(earthquake):
+        return {field: earthquake.get(field) for field in EARTHQUAKE_FIELDS}
+
+    valid = [
+        earthquake for earthquake in earthquakes
+        if isinstance(earthquake.get("magnitude"), (int, float))
+    ]
+    strongest = sorted(valid, key=lambda earthquake: earthquake["magnitude"], reverse=True)[:size]
+    recent = sorted(earthquakes, key=lambda earthquake: str(earthquake.get("time")), reverse=True)[:size]
+    bands = {
+        "below_2": sum(earthquake["magnitude"] < 2 for earthquake in valid),
+        "2_to_3.9": sum(2 <= earthquake["magnitude"] < 4 for earthquake in valid),
+        "4_to_5.9": sum(4 <= earthquake["magnitude"] < 6 for earthquake in valid),
+        "6_and_above": sum(earthquake["magnitude"] >= 6 for earthquake in valid),
+    }
+
+    return {
+        "strongest": [compact(earthquake) for earthquake in strongest],
+        "most_recent": [compact(earthquake) for earthquake in recent],
+        "magnitude_bands": bands,
+        "tsunami_flags": sum(bool(earthquake.get("tsunami")) for earthquake in earthquakes),
+    }
 
 
 def get_nexus_weather(latitude: float, longitude: float):
@@ -290,9 +322,17 @@ def detect_city(message: str):
 
 
 
+def fold_accents(text: str) -> str:
+    """'Reykjavík' and 'Reykjavik' must compare equal."""
+    return "".join(
+        character for character in unicodedata.normalize("NFKD", text)
+        if not unicodedata.combining(character)
+    ).casefold()
+
+
 def extract_dynamic_city_candidates(message: str) -> list[str]:
     match = re.search(
-        r"\bde\s+([^.!?¿]+)|:\s*([^.!?¿]+)",
+        r"\b(?:de|in|en|between|entre)\s+([^.!?¿]+)|:\s*([^.!?¿]+)",
         message,
         re.IGNORECASE
     )
@@ -303,16 +343,17 @@ def extract_dynamic_city_candidates(message: str) -> list[str]:
     city_text = match.group(1) or match.group(2)
 
     candidates = re.split(
-        r"\s*,\s*|\s+(?:y|o)\s+",
+        r"\s*,\s*|\s+(?:y|o|and|or|vs\.?|versus)\s+",
         city_text,
         flags=re.IGNORECASE
     )
 
+    # "en Tokio y en París" -> "París"
     return [
-        candidate.strip()
+        re.sub(r"^(?:in|en|de|the|la|el)\s+", "", candidate.strip(), flags=re.IGNORECASE)
         for candidate in candidates
         if candidate.strip()
-    ]
+    ][:4]
 
 
 
@@ -321,17 +362,19 @@ def detect_dynamic_cities(message: str) -> list[str]:
     valid_cities = []
 
     for candidate in candidates:
-        city_name = normalize_city_name(candidate)
-        city_data = validate_city(city_name)
+        words = candidate.split()
 
-        if not city_data:
-            continue
+        # "Reykjavík right now" -> try "Reykjavík right now", "Reykjavík right", "Reykjavík".
+        for size in range(min(len(words), 3), 0, -1):
+            city_name = normalize_city_name(" ".join(words[:size]))
+            city_data = validate_city(city_name)
 
-        if city_name.casefold() != city_data.get("name", "").casefold():
-            continue
+            if not city_data or fold_accents(city_name) != fold_accents(city_data.get("name", "")):
+                continue
 
-        if city_name not in valid_cities:
-            valid_cities.append(city_name)
+            if city_name not in valid_cities:
+                valid_cities.append(city_name)
+            break
 
     return valid_cities
 
@@ -706,7 +749,8 @@ def generate_ai_response(
     
     weather_data = None
     
-    multiple_cities = detect_multiple_cities(message)
+    # City detection geocodes candidates, so only run it for weather questions.
+    multiple_cities = detect_multiple_cities(message) if needs_weather_data else []
 
     if needs_weather_data and len(multiple_cities) > 1:
         weather_data = []
@@ -867,8 +911,10 @@ def generate_ai_response(
     if needs_earthquake_data:
         earthquake_context = (
             "The following earthquake records were retrieved "
-            "from the NEXUS earthquake API:\n"
-            f"{earthquakes}\n\n"
+            "from the NEXUS earthquake API. They cover every event "
+            "reported by USGS in the past 24 hours (times in UTC); "
+            "only the strongest and most recent events are listed:\n"
+            f"{summarize_earthquake_records(earthquakes)}\n\n"
             "The strongest earthquake in these records was "
             "calculated directly by Python:\n"
             f"{strongest_earthquake}\n\n"
@@ -924,8 +970,9 @@ def generate_ai_response(
             "For multi-city weather comparisons, the field "
             "observations_simultaneous contains the result "
             "calculated directly by Python. "
-            "If it is True, confirm that all observations "
-            "were taken at the same instant. "
+            "If it is True, confirm in one short sentence that all observations "
+            "were taken at the same instant, and never describe them as taken "
+            "at different instants or times. "
             "If it is False, explain that the observations "
             "were taken at different instants. "
             "If it is None, explain that simultaneity "
