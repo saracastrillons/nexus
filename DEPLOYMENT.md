@@ -1,41 +1,60 @@
-# Preparar la demo pública
+# Deployment
 
-Esta copia no contiene claves, bases de datos privadas ni los archivos `.env` del ZIP original. Tu proyecto y ZIP originales permanecen intactos.
+NEXUS can be deployed as two separate services or as a single Docker Compose stack. In both cases provider keys stay on the server; the front end never receives them.
 
-## Probar primero
+## Configuration
 
-1. Usa esta carpeta completa como una copia nueva del proyecto. No mezcles el `node_modules` o `.venv` antiguos con ella.
-2. Sigue la instalación del README. Para recuperar tu configuración de PostgreSQL/Gemini, copia tus valores privados a `backend/.env` localmente.
-3. Comprueba Dashboard, Earthquakes, Weather y AI Assistant, tanto en escritorio como con la ventana estrecha.
-4. Ejecuta las pruebas y `npm run build` antes de publicar.
+Back-end environment variables (see `backend/.env.example`):
 
-## Opción A: frontend y API en servicios separados
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | `sqlite:///./nexus.db` by default. Use a `postgresql+psycopg://` URL for persistent hosting. |
+| `CORS_ORIGINS` | JSON list of the exact front-end origins, for example `["https://nexus.example.com"]`. |
+| `GEMINI_API_KEY` | Optional. Enables the AI analyst. |
+| `GEMINI_MODEL` | Gemini model name. Defaults to `gemini-flash-lite-latest`. |
+| `INTERNAL_API_URL` | Address the back end uses to call its own API when answering AI questions. Must match the port Uvicorn listens on. |
 
-- Backend: ejecutar desde `backend` con `uvicorn app.main:app --host 0.0.0.0 --port <puerto del servicio>`.
-- Configurar `DATABASE_URL` (PostgreSQL con almacenamiento persistente), `GEMINI_API_KEY` opcional y `GEMINI_MODEL` en el entorno del servidor.
-- Configurar `INTERNAL_API_URL` para que los llamados internos de IA lleguen al mismo servicio; el puerto debe coincidir con el de Uvicorn.
-- Configurar `CORS_ORIGINS` como una lista JSON de los dominios exactos del frontend, por ejemplo `["https://tu-dominio.example"]`.
-- Frontend: configurar `VITE_API_URL=https://tu-api.example` **antes de compilar**, ejecutar `npm ci` y `npm run build`; publicar `frontend/dist`.
-- Mantener HTTPS en ambas partes. Aplicar límites a las solicitudes de IA en el servidor o en el proxy de la plataforma y limitar el gasto en el proveedor.
+Front-end build variable (see `frontend/.env.example`):
 
-Si `VITE_API_URL` está vacío en producción, el frontend llama `/api` en su propio dominio: hace falta un proxy hacia FastAPI. Cambiar una variable de Vite después del build no modifica los archivos ya compilados.
+| Variable | Purpose |
+| --- | --- |
+| `VITE_API_URL` | Public HTTPS address of the API. Leave empty to call `/api` on the same domain through a proxy. It is read at build time, so rebuild after changing it. |
 
-## Opción B: Docker Compose
+## Option A: separate services
 
-Hay Dockerfiles para frontend/backend, nginx con proxy de `/api` y un volumen persistente para SQLite:
+**API**
 
-```powershell
-docker compose up --build
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
-Abrir `http://localhost:8080`. Para habilitar IA, definir `GEMINI_API_KEY` en el entorno antes de ejecutar Compose. No está publicada la puerta 8000 del backend; nginx conecta ambos servicios internamente.
+Set the variables above in the hosting provider and attach a PostgreSQL database for persistence.
 
-Esta configuración de Docker se preparó como alternativa de despliegue, pero no se ejecutó en este entorno porque Docker no está instalado. Antes de publicar, probar los contenedores y colocar HTTPS delante de nginx. El límite de IA por IP del proxy no sustituye una política de acceso ni los límites del proveedor.
+**Front end**
 
-## Antes de compartir con un reclutador
+```bash
+cd frontend
+npm ci
+VITE_API_URL=https://your-api.example.com npm run build
+```
 
-- Enlace público que abra sin instrucciones ni claves.
-- Comprobar desde una sesión nueva que llegan eventos y clima reales.
-- Confirmar que una ciudad inexistente y un servicio desconectado muestran errores útiles.
-- Grabar un recorrido de 45–60 segundos con las cuatro secciones.
-- Añadir al README el enlace público y capturas de esa demo, sin credenciales ni datos personales.
+Publish the `frontend/dist` folder on any static host. Configure the host to serve `index.html` for unknown paths.
+
+## Option B: Docker Compose
+
+The repository includes Dockerfiles for both services and an nginx configuration that serves the front end, proxies `/api` to FastAPI and keeps SQLite on a persistent volume.
+
+```bash
+GEMINI_API_KEY=your-key docker compose up --build
+```
+
+The application is available at `http://localhost:8080`. The API port is not exposed; nginx connects both containers internally.
+
+## Production checklist
+
+- Serve both parts over HTTPS.
+- Restrict `CORS_ORIGINS` to the real front-end domain.
+- Keep a rate limit on `POST /api/ai/chat`. The bundled nginx configuration allows six requests per minute per IP; add an equivalent limit on other platforms, and set a spending limit with the AI provider.
+- Use PostgreSQL when running more than one instance.

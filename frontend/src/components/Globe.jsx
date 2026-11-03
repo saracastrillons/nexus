@@ -28,7 +28,8 @@ export default function Globe({ events, motion = true, focus, onSelect, height =
   const [layers, setLayers] = useState({ plates: true, pulses: true, spikes: true });
   const [plates, setPlates] = useState([]);
 
-  const visible = useMemo(() => events.filter(event => numeric(event.latitude) !== null && numeric(event.longitude) !== null && (numeric(event.magnitude) ?? -Infinity) >= minimum).sort((a, b) => (numeric(b.magnitude) ?? 0) - (numeric(a.magnitude) ?? 0)), [events, minimum]);
+  // "ALL" keeps every located event, including valid negative magnitudes.
+  const visible = useMemo(() => events.filter(event => numeric(event.latitude) !== null && numeric(event.longitude) !== null && (minimum === 0 || (numeric(event.magnitude) ?? -Infinity) >= minimum)).sort((a, b) => (numeric(b.magnitude) ?? 0) - (numeric(a.magnitude) ?? 0)), [events, minimum]);
   const newest = useMemo(() => visible.reduce((max, event) => Math.max(max, timestamp(event.time) ?? 0), 0), [visible]);
   const pulses = useMemo(() => layers.pulses ? visible.filter(event => (numeric(event.magnitude) ?? 0) >= 4 || (timestamp(event.time) ?? 0) >= newest - 3600000).slice(0, 60) : [], [visible, layers.pulses, newest]);
   const selectedIndex = selected ? visible.findIndex(event => eventId(event) === eventId(selected)) : -1;
